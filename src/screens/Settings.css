@@ -1,0 +1,89 @@
+.settings { max-width: 560px; display: flex; flex-direction: column; gap: 14px; }
+
+.set-card { padding: 22px 24px 24px; }
+
+.set-h {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.set-sub {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.set-plats { display: flex; flex-wrap: wrap; gap: 7px; }
+.set-plat {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  color: var(--ink-soft);
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.set-plat:hover { background: var(--paper-warm); }
+.set-plat.is-on {
+  background: var(--ink); border-color: var(--ink); color: var(--paper);
+  font-weight: 500;
+}
+
+.set-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.set-msg { font-size: 13px; color: var(--ok); }
+.set-ok  { margin: 12px 0 0; font-size: 13px; color: var(--ok); }
+.set-err { margin: 12px 0 0; font-size: 13px; color: var(--stop); }
+
+.set-note {
+  margin: 0;
+  padding: 13px 15px;
+  background: var(--paper-warm);
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.set-divider {
+  height: 1px;
+  background: var(--paper-edge);
+  margin: 20px 0;
+}
+
+.set-toggle {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+.set-toggle + .set-toggle { border-top: 1px solid var(--paper-warm); }
+.set-toggle input {
+  width: 18px; height: 18px;
+  accent-color: var(--ink);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.set-pending {
+  padding: 15px 17px;
+  background: var(--paper-warm);
+  border-radius: var(--r-md);
+}
+.set-pending strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--warn);
+}
+.set-pending p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}

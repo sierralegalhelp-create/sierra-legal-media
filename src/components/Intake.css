@@ -1,0 +1,72 @@
+.intake { margin-top: 16px; max-width: 560px; }
+.intake-loading { min-height: 280px; display: grid; place-items: center; }
+
+.intake-head { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--paper-edge); }
+.intake-head h2 { font-size: 22px; margin-bottom: 6px; }
+.intake-head p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-soft); }
+.intake-saved { color: var(--ok); }
+
+.intake-section { display: block; margin-bottom: 22px; }
+.intake-label { display: block; margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-soft); }
+
+.intake-post { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; padding: 12px; background: var(--paper-warm); border-radius: var(--r-md); }
+.intake-post-top { display: flex; gap: 8px; align-items: center; }
+.intake-topic { flex: 1; }
+.intake-when { width: 100%; }
+.intake-photo { width: 100%; }
+.intake-thumb { border-radius: 8px; overflow: hidden; max-width: 160px; }
+.intake-thumb img { width: 100%; display: block; }
+
+.intake input, .intake textarea {
+  width: 100%; padding: 11px 13px;
+  border: 1px solid var(--paper-edge); border-radius: var(--r-sm);
+  background: var(--surface); font-size: 14px;
+}
+.intake input:focus, .intake textarea:focus { outline: none; border-color: var(--ink-faint); }
+.intake textarea { resize: vertical; line-height: 1.55; }
+
+.intake-x {
+  width: 34px; height: 38px; flex-shrink: 0;
+  border: 1px solid var(--paper-edge); border-radius: var(--r-sm);
+  background: transparent; color: var(--ink-faint); font-size: 12px;
+}
+.intake-x:hover { background: rgba(163,74,60,0.06); color: var(--stop); border-color: rgba(163,74,60,0.28); }
+
+.intake-add { margin-top: 2px; padding: 8px 0; background: none; border: none; color: var(--ink-soft); font-size: 13.5px; font-weight: 500; }
+.intake-add:hover { color: var(--ink); }
+
+.intake-types { display: flex; flex-wrap: wrap; gap: 7px; }
+.intake-type {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 12px;
+  background: transparent; border: 1px solid var(--paper-edge); border-radius: var(--r-sm);
+  font-size: 13px; color: var(--ink-soft);
+}
+.intake-type:hover { background: var(--paper-warm); }
+.intake-type.is-more { border-color: var(--ok); background: rgba(79,122,82,0.07); color: var(--ink); }
+.intake-type.is-less { border-color: var(--ink-faint); background: var(--paper-warm); color: var(--ink-soft); opacity: 0.7; }
+.intake-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.intake-flag { font-size: 10.5px; font-weight: 600; }
+.intake-type.is-more .intake-flag { color: var(--ok); }
+.intake-type.is-less .intake-flag { color: var(--ink-soft); }
+
+.intake-err { margin: 0 0 14px; font-size: 13px; color: var(--stop); }
+
+/* Admin's read-only view of a submitted brief */
+.brief { grid-column: 1 / -1; }
+.brief-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--paper-edge); }
+.brief-head h3 { margin: 0; font-size: 17px; }
+.brief-block { margin-bottom: 16px; }
+.brief-block:last-child { margin-bottom: 0; }
+.brief-label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+.brief-block p { margin: 0; font-size: 14px; line-height: 1.55; }
+.brief-post { display: flex; align-items: baseline; gap: 10px; padding: 6px 0; }
+.brief-post b { font-size: 14px; font-weight: 600; }
+.brief-post small { font-size: 12px; color: var(--ink-soft); }
+.brief-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.brief-tag { padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 500; }
+.brief-more { background: rgba(79,122,82,0.12); color: var(--ok); }
+.brief-less { background: var(--paper-warm); color: var(--ink-soft); }
+.brief-empty { font-size: 14px; color: var(--ink-faint); }
+
+@media (max-width: 560px) { .intake-when { width: 100px; } }

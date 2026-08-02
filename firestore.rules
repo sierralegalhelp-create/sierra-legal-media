@@ -1,0 +1,139 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────
+    // Admin access is granted ONLY to this email.
+    // ─────────────────────────────────────────────────────────
+    function adminEmail() {
+      return 'sierra.legalhelp@gmail.com';
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() == adminEmail();
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Fields a client may change on their own post. Nothing else.
+    function clientPostPatchIsLegal() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['status', 'clientNote', 'approvedAt', 'updatedAt']);
+    }
+
+    // And only into these two states.
+    function clientStatusIsLegal() {
+      return request.resource.data.status in ['approved', 'changes_requested'];
+    }
+
+    // A client may only act on a post that's actually waiting on them.
+    function postWasPending() {
+      return resource.data.status == 'pending_approval';
+    }
+
+    match /clients/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+
+      // First sign-in self-provision. Must start in onboarding with an
+      // inactive subscription so nobody can mint themselves a paid, active plan.
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.accountState == 'onboarding'
+        && request.resource.data.subscription.status == 'inactive';
+
+      // Clients may edit their own profile fields and submit the signup
+      // form. They can NEVER set themselves active or change their tier —
+      // only Sierra (admin) can do that.
+      function clientProfilePatchIsLegal() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return changed.hasOnly([
+          'firmName', 'platforms', 'goal', 'phone', 'notes',
+          'requestedTier', 'accountState', 'submittedAt', 'notifyPrefs'
+        ]);
+      }
+
+      // A client may only move themselves onboarding -> pending.
+      // Once pending or active, they can never change their own state.
+      function clientStateChangeIsLegal() {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountState'])
+          || (resource.data.accountState == 'onboarding'
+              && request.resource.data.accountState == 'pending');
+      }
+
+      allow update: if isAdmin()
+        || (isOwner(uid)
+            && clientProfilePatchIsLegal()
+            && clientStateChangeIsLegal());
+
+      allow delete: if isAdmin();
+
+      match /posts/{postId} {
+        // Clients never see drafts.
+        allow read: if isAdmin()
+          || (isOwner(uid) && resource.data.status != 'draft');
+
+        allow create, delete: if isAdmin();
+
+        allow update: if isAdmin()
+          || (isOwner(uid)
+              && postWasPending()
+              && clientPostPatchIsLegal()
+              && clientStatusIsLegal());
+      }
+
+      match /messages/{msgId} {
+        allow read: if isOwner(uid) || isAdmin();
+
+        // You may only send as yourself.
+        allow create: if (isAdmin() && request.resource.data.fromAdmin == true)
+          || (isOwner(uid) && request.resource.data.fromAdmin == false);
+
+        // Read receipts only. Nobody edits message text after sending.
+        allow update: if (isOwner(uid) || isAdmin())
+          && request.resource.data.diff(resource.data)
+               .affectedKeys().hasOnly(['readByClient', 'readByAdmin']);
+
+        allow delete: if isAdmin();
+      }
+
+      match /stats/{yyyymm} {
+        // Written only by the nightly function through the Admin SDK.
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if false;
+      }
+
+      // Monthly brief the client fills in. They write their own; Sierra reads.
+      match /briefs/{yyyymm} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid) || isAdmin();
+        allow delete: if isAdmin();
+      }
+
+      // Platform API tokens are secrets. Only the Admin SDK (nightly
+      // stats function) touches these — never the browser, not even
+      // the client who owns the account.
+      match /secrets/{doc} {
+        allow read, write: if false;
+      }
+    }
+
+    // Sierra's private to-do list. Admin only.
+    match /todos/{todoId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

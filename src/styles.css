@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;450;500;600&display=swap');
+
+:root {
+  /* Paper side */
+  --surface:     #FFFDFA;   /* cards, inputs, sheets — the raised white */
+  --surface-alt: #FFFFFF;   /* pure white: mimics real IG/FB chrome */
+  --paper:      #F7F3EC;
+  --paper-warm: #F1EBE1;
+  --paper-edge: #E3DACC;
+  --ink:        #1C1A17;
+  --ink-soft:   #6E665C;
+  --ink-faint:  #A29889;
+
+  /* Panel side */
+  --panel:     #232323;
+  --panel-sub: #1B1B1B;
+  --cell:      #2E2E2E;
+  --cell-out:  #292929;
+  --cell-hi:   #363636;
+  --chalk:      #EDE8E0;
+  --chalk-soft: #8B8478;
+
+  /* Semantic. Muted on purpose — the content colors own the saturation. */
+  --ok:    #4F7A52;
+  --warn:  #B4763A;
+  --stop:  #A34A3C;
+
+  --r-sm: 8px;
+  --r-md: 13px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+
+  --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --sans:  'Inter', system-ui, -apple-system, sans-serif;
+
+  --shadow-lift:  0 2px 8px -2px rgba(28,26,23,0.10);
+  --shadow-panel: 0 24px 60px -28px rgba(28,26,23,0.55);
+  --shadow-sheet: 0 32px 80px -20px rgba(28,26,23,0.40);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+button { font: inherit; cursor: pointer; }
+input, textarea, select { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Shared primitives ─────────────────────────────────────── */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 17px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  font-size: 14px; font-weight: 500;
+  transition: background 130ms ease, border-color 130ms ease, transform 90ms ease;
+  text-decoration: none;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.btn-primary   { background: var(--ink); color: var(--paper); }
+.btn-primary:hover:not(:disabled) { background: #2E2A25; }
+
+.btn-secondary { background: transparent; color: var(--ink); border-color: var(--paper-edge); }
+.btn-secondary:hover:not(:disabled) { background: var(--paper-warm); border-color: var(--ink-faint); }
+
+.btn-quiet     { background: transparent; color: var(--ink-soft); padding: 7px 11px; }
+.btn-quiet:hover:not(:disabled) { background: var(--paper-warm); color: var(--ink); }
+
+.btn-danger    { background: transparent; color: var(--stop); border-color: rgba(163,74,60,0.28); }
+.btn-danger:hover:not(:disabled) { background: rgba(163,74,60,0.07); }
+
+.btn-full { width: 100%; }
+
+.field { display: block; margin-bottom: 15px; }
+.field > span {
+  display: block; margin-bottom: 6px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.03em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  transition: border-color 130ms ease;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none; border-color: var(--ink-faint);
+}
+.field textarea { resize: vertical; min-height: 92px; line-height: 1.55; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--r-lg);
+  padding: 22px;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.pill-draft    { background: var(--paper-warm); color: var(--ink-soft); }
+.pill-pending  { background: rgba(180,118,58,0.13); color: var(--warn); }
+.pill-approved { background: rgba(79,122,82,0.13);  color: var(--ok); }
+.pill-changes  { background: rgba(163,74,60,0.11);  color: var(--stop); }
+.pill-published{ background: rgba(28,26,23,0.07);   color: var(--ink-soft); }
+
+.empty {
+  text-align: center;
+  padding: 52px 24px;
+  color: var(--ink-soft);
+}
+.empty h3 { font-size: 19px; color: var(--ink); margin-bottom: 7px; }
+.empty p  { margin: 0 auto; max-width: 340px; font-size: 14px; line-height: 1.6; }
+
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid var(--paper-edge);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin 640ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Dark mode — Sierra's side only.
+   Only the tokens change. Every component reads --surface /
+   --paper / --ink, so they all follow; nothing is left white
+   with light text on it. Warm charcoal keeps the brand's warmth,
+   and the calendar panel goes LIGHTER than the page so it still
+   lifts the way it does on cream.
+   ───────────────────────────────────────────────────────────── */
+.dark {
+  --surface:     #201E1B;   /* was near-white; now a raised dark */
+  --surface-alt: #FBFAF8;   /* stays light on purpose — see .pp below */
+  --paper:       #171614;
+  --paper-warm:  #1F1D1A;
+  --paper-edge:  #35312C;
+  --ink:         #F0EBE3;
+  --ink-soft:    #A79E92;
+  --ink-faint:   #74695C;
+
+  --panel:       #262320;
+  --panel-sub:   #1F1D1A;
+  --cell:        #322E2A;
+  --cell-out:    #292622;
+  --cell-hi:     #3E3936;
+  --chalk:       #F0EBE3;
+  --chalk-soft:  #9A9184;
+
+  --ok:    #7FAE82;
+  --warn:  #D69A5C;
+  --stop:  #D07766;
+
+  --shadow-lift:  0 2px 10px -2px rgba(0,0,0,0.6);
+  --shadow-panel: 0 28px 70px -30px rgba(0,0,0,0.9);
+  --shadow-sheet: 0 32px 90px -20px rgba(0,0,0,0.75);
+
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* Inputs sit BELOW the card surface so they read as wells. */
+.dark input,
+.dark textarea,
+.dark select { background: #141311; border-color: var(--paper-edge); color: var(--ink); }
+.dark input::placeholder,
+.dark textarea::placeholder { color: var(--ink-faint); }
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus { border-color: var(--ink-faint); }
+
+/* Buttons */
+.dark .btn-primary { background: var(--chalk); color: #171614; }
+.dark .btn-primary:hover:not(:disabled) { background: #fff; }
+.dark .btn-secondary { background: transparent; border-color: var(--paper-edge); color: var(--ink); }
+.dark .btn-secondary:hover:not(:disabled) { background: var(--paper-warm); }
+.dark .btn-quiet { color: var(--ink-soft); }
+.dark .btn-quiet:hover:not(:disabled) { color: var(--ink); background: var(--paper-warm); }
+
+/* Chrome */
+.dark .dash-tabs, .dark .dash-head { border-color: var(--paper-edge); }
+.dark .dash-tab { color: var(--ink-soft); }
+.dark .dash-tab:hover { color: var(--ink); }
+.dark .dash-tab.is-on { color: var(--ink); border-color: var(--ink); }
+
+/* The post preview deliberately stays light — it's imitating
+   Instagram/Facebook, which are light apps. Text pinned dark so it
+   never inherits the light ink from the theme. */
+.dark .pp { color: #1C1A17; }
+.dark .pp-ig-time, .dark .pp-fb-top small, .dark .pp-li-top small { color: #8A8172; }
+.dark .pp-fb-actions, .dark .pp-li-actions { color: #6E665C; border-color: #E3DACC; }
+.dark .pp-tabs { background: #141311; }
+.dark .pp-tab { color: var(--ink-soft); }
+.dark .pp-tab.is-on { background: var(--chalk); color: #171614; }
+
+/* Toast inverts so it stays legible. */
+.dark .toast { background: var(--chalk); color: #171614; }
