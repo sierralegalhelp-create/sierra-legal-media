@@ -62,12 +62,15 @@ export async function submitSignup(uid, info) {
 
 // Sierra approves -> client gets full access.
 export async function approveClient(uid, tier) {
+  const snap = await getDoc(doc(db, "clients", uid));
+  const c = snap.data() || {};
   await updateDoc(doc(db, "clients", uid), {
     accountState: "active",
     "subscription.tier": tier,
     "subscription.status": "active",
     approvedAt: serverTimestamp(),
   });
+  if (c.email) notifyClient("account_approved", c.firmName || "your firm", c.email);
 }
 
 // Client editing their own settings. The rules restrict which fields
@@ -294,18 +297,46 @@ export async function deleteTodo(id) {
 }
 
 // ── Notifications ────────────────────────────────────────────
-// Fire-and-forget: texts Sierra. Never blocks or throws into the
-// action that triggered it.
-export function notifySierra(eventType, firmName) {
+// Fire-and-forget notifications. Never blocks or throws into the action
+// that triggered it. `to` is "sierra" (default) or a client email address.
+export function notify(eventType, { firmName, to, clientEmail } = {}) {
   try {
     fetch("/.netlify/functions/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event: eventType, firmName }),
+      body: JSON.stringify({ event: eventType, firmName, to, clientEmail }),
     }).catch(() => {});
   } catch {
     /* ignore */
   }
+}
+
+// Back-compat: existing calls that emailed Sierra keep working.
+export function notifySierra(eventType, firmName) {
+  notify(eventType, { firmName, to: "sierra" });
+}
+
+// Notify a specific client at their email.
+export function notifyClient(eventType, firmName, clientEmail) {
+  notify(eventType, { firmName, to: "client", clientEmail });
+}
+
+// Email a client that Sierra sent them a message.
+export async function notifyClientMessage(clientUid) {
+  try {
+    const snap = await getDoc(doc(db, "clients", clientUid));
+    const c = snap.data();
+    if (c?.email) notifyClient("message_from_sierra", c.firmName || "your firm", c.email);
+  } catch { /* ignore */ }
+}
+
+// Look up a client and email them that a post is waiting for approval.
+export async function notifyPostReady(clientUid) {
+  try {
+    const snap = await getDoc(doc(db, "clients", clientUid));
+    const c = snap.data();
+    if (c?.email) notifyClient("post_ready", c.firmName || "your firm", c.email);
+  } catch { /* ignore */ }
 }
 
 // ── Monthly brief (client intake) ────────────────────────────
