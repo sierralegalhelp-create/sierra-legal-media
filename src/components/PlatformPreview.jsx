@@ -9,22 +9,55 @@ function fmtDay(ts) {
 
 function Media({ post, ratio }) {
   const type = CONTENT_TYPES[post.contentType];
-  const [failed, setFailed] = useState(false);
+  // Accept both new multi-image posts and old single-image ones.
+  const urls = (post.mediaUrls?.length ? post.mediaUrls : post.mediaUrl ? [post.mediaUrl] : [])
+    .filter(Boolean);
+  const [idx, setIdx] = useState(0);
+  const [failed, setFailed] = useState({});
 
-  if (post.mediaUrl && !failed) {
+  if (urls.length === 0) {
     return (
-      <div className="pp-media" style={{ aspectRatio: ratio }}>
-        <img src={post.mediaUrl} alt="" onError={() => setFailed(true)} />
+      <div className="pp-media pp-media-empty" style={{ aspectRatio: ratio, background: `linear-gradient(135deg, ${type?.color}, ${type?.color}cc)` }}>
+        <span>{type?.label}</span>
       </div>
     );
   }
-  // No image yet, or the link didn't load — tinted stand-in so layout still reads.
+
+  const safe = Math.min(idx, urls.length - 1);
+  const current = urls[safe];
+
   return (
-    <div
-      className="pp-media pp-media-empty"
-      style={{ aspectRatio: ratio, background: `linear-gradient(135deg, ${type?.color}, ${type?.color}cc)` }}
-    >
-      <span>{failed ? "Image didn't load" : type?.label}</span>
+    <div className="pp-media pp-carousel" style={{ aspectRatio: ratio }}>
+      {failed[safe] ? (
+        <div className="pp-media-empty" style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${type?.color}, ${type?.color}cc)` }}>
+          <span>Image didn't load</span>
+        </div>
+      ) : (
+        <img src={current} alt="" onError={() => setFailed((f) => ({ ...f, [safe]: true }))} />
+      )}
+
+      {urls.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="pp-arrow pp-arrow-l"
+            aria-label="Previous image"
+            onClick={() => setIdx((n) => (n - 1 + urls.length) % urls.length)}
+          >‹</button>
+          <button
+            type="button"
+            className="pp-arrow pp-arrow-r"
+            aria-label="Next image"
+            onClick={() => setIdx((n) => (n + 1) % urls.length)}
+          >›</button>
+          <div className="pp-dots">
+            {urls.map((_, i) => (
+              <span key={i} className={`pp-dot${i === safe ? " is-on" : ""}`} />
+            ))}
+          </div>
+          <div className="pp-count">{safe + 1}/{urls.length}</div>
+        </>
+      )}
     </div>
   );
 }

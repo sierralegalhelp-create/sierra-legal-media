@@ -117,3 +117,29 @@
   .comp-foot-right { width: 100%; }
   .comp-foot-right .btn { flex: 1; }
 }
+
+/* Multi-image builder */
+.comp-imgrow { margin-bottom: 10px; }
+.comp-imgrow-top { display: flex; align-items: center; gap: 8px; }
+.comp-imgnum {
+  width: 22px; height: 22px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--paper-warm); border-radius: 50%;
+  font-size: 12px; font-weight: 600; color: var(--ink-soft);
+}
+.comp-imgrow-top input { flex: 1; }
+.comp-imgx {
+  flex-shrink: 0; width: 28px; height: 28px;
+  border: none; background: none; color: var(--ink-faint);
+  font-size: 13px; cursor: pointer;
+}
+.comp-imgx:hover { color: var(--stop); }
+.comp-thumb { margin: 8px 0 0 30px; max-width: 140px; border-radius: 8px; overflow: hidden; }
+.comp-thumb img { width: 100%; display: block; }
+.comp-addimg {
+  margin-top: 4px; padding: 8px 14px;
+  background: transparent; border: 1px dashed var(--paper-edge);
+  border-radius: var(--r-sm); color: var(--ink-soft);
+  font-size: 13px; cursor: pointer;
+}
+.comp-addimg:hover { border-color: var(--ink-faint); color: var(--ink); }

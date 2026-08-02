@@ -15,7 +15,7 @@ const BLANK = {
   format: "post",
   platforms: ["instagram"],
   caption: "",
-  mediaUrl: "",
+  mediaUrls: [""],
 };
 
 export default function Composer({ clientUid, post, initialDate, onClose }) {
@@ -23,12 +23,18 @@ export default function Composer({ clientUid, post, initialDate, onClose }) {
 
   const [form, setForm] = useState(() => {
     if (post) {
+      // Accept old single-image posts and new multi-image ones.
+      const urls = post.mediaUrls?.length
+        ? post.mediaUrls
+        : post.mediaUrl
+          ? [post.mediaUrl]
+          : [""];
       return {
         contentType: post.contentType,
         format: post.format || "post",
         platforms: post.platforms || [],
         caption: post.caption || "",
-        mediaUrl: post.mediaUrl || "",
+        mediaUrls: urls,
       };
     }
     return BLANK;
@@ -73,8 +79,13 @@ export default function Composer({ clientUid, post, initialDate, onClose }) {
     if (problem) { setErr(problem); return; }
 
     setBusy(true); setErr("");
+    // Drop empty link fields; keep mediaUrl (first image) so any older
+    // code path and single-image reads still work.
+    const cleanUrls = form.mediaUrls.map((u) => u.trim()).filter(Boolean);
     const payload = {
       ...form,
+      mediaUrls: cleanUrls,
+      mediaUrl: cleanUrls[0] || "",
       caption: form.caption.trim(),
       scheduledFor: Timestamp.fromDate(new Date(when)),
       status,
@@ -188,28 +199,53 @@ export default function Composer({ clientUid, post, initialDate, onClose }) {
           </label>
 
           <div className="field">
-            <span>Image link</span>
-            <input
-              type="url"
-              value={form.mediaUrl}
-              onChange={(e) => set("mediaUrl", e.target.value)}
-              placeholder="Paste an image link (ends in .jpg or .png)"
-            />
-            {form.mediaUrl && (
-              <div className="comp-preview">
-                <img src={form.mediaUrl} alt="" onError={(e) => { e.target.style.display = "none"; }} />
-                <button
-                  type="button"
-                  className="comp-remove"
-                  onClick={() => set("mediaUrl", "")}
-                >
-                  Remove
-                </button>
+            <span>Images {form.mediaUrls.filter((u) => u.trim()).length > 1 ? "(carousel)" : ""}</span>
+
+            {form.mediaUrls.map((url, i) => (
+              <div key={i} className="comp-imgrow">
+                <div className="comp-imgrow-top">
+                  <span className="comp-imgnum">{i + 1}</span>
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => {
+                      const next = [...form.mediaUrls];
+                      next[i] = e.target.value;
+                      set("mediaUrls", next);
+                    }}
+                    placeholder="Paste an image link (ends in .jpg or .png)"
+                  />
+                  {form.mediaUrls.length > 1 && (
+                    <button
+                      type="button"
+                      className="comp-imgx"
+                      aria-label="Remove this image"
+                      onClick={() => set("mediaUrls", form.mediaUrls.filter((_, idx) => idx !== i))}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                {url.trim() && (
+                  <div className="comp-thumb">
+                    <img src={url} alt="" onError={(e) => { e.target.style.display = "none"; }} />
+                  </div>
+                )}
               </div>
-            )}
+            ))}
+
+            <button
+              type="button"
+              className="comp-addimg"
+              onClick={() => set("mediaUrls", [...form.mediaUrls, ""])}
+            >
+              + Add another image
+            </button>
+
             <p className="comp-hint">
-              Paste a link to an image (from Canva, Google Drive, Dropbox, or anywhere online).
-              Photo uploads can be turned on later.
+              Add one image, or several for a swipeable carousel. Paste a direct image
+              link (from Canva, Drive, Dropbox, or an image host). The client sees them
+              in the same order.
             </p>
           </div>
 
