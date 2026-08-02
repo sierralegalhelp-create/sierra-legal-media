@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Timestamp } from "firebase/firestore";
 import { CONTENT_TYPES, PLATFORMS, STATUS, FORMATS } from "../lib/constants";
-import { createPost, updatePost, deletePost } from "../lib/data";
+import { createPost, updatePost, deletePost, notifyPostReady } from "../lib/data";
 import "./Composer.css";
 
 function toLocalInput(ts) {
@@ -94,6 +94,7 @@ export default function Composer({ clientUid, post, initialDate, onClose }) {
     try {
       if (editing) await updatePost(clientUid, post.id, payload);
       else         await createPost(clientUid, payload);
+      if (status === STATUS.pending_approval) notifyPostReady(clientUid);
       onClose();
     } catch {
       setErr("That didn't save. Check your connection and try again.");

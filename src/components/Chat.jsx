@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { watchMessages, sendMessage, markRead, notifySierra } from "../lib/data";
+import { watchMessages, sendMessage, markRead, notifySierra, notifyClientMessage } from "../lib/data";
 import "./Chat.css";
 
 function fmtWhen(ts) {
@@ -43,6 +43,7 @@ export default function Chat({ clientUid, isAdmin, authorName, firmName }) {
     try {
       await sendMessage(clientUid, { text, fromAdmin: isAdmin, authorName });
       if (!isAdmin) notifySierra("new_message", firmName);
+      else          notifyClientMessage(clientUid);
     } catch {
       setErr("That message didn't send. Try again.");
       setDraft(text);
