@@ -48,10 +48,8 @@ export default function Settings({ client, clientUid }) {
   const [authMsg, setAuthMsg] = useState("");
   const [authErr, setAuthErr] = useState("");
 
-  // ── Notifications
-  const prefs = client?.notifyPrefs ?? { postsReady: true, messages: true, monthly: true };
-  const [notify, setNotify] = useState(prefs);
-  const [notifyMsg, setNotifyMsg] = useState("");
+  // ── Notifications: hidden for now — client emails aren't live until a
+  // sending domain is verified in Resend. Re-add the toggle then.
 
   const isPasswordUser = user?.providerData?.some((p) => p.providerId === "password");
 
@@ -78,17 +76,6 @@ export default function Settings({ client, clientUid }) {
       setFirmMsg("That didn't save. Try again.");
     }
     setFirmBusy(false);
-  }
-
-  async function saveNotify(next) {
-    setNotify(next);
-    try {
-      await updateMyProfile(clientUid, { notifyPrefs: next });
-      setNotifyMsg("Saved.");
-      setTimeout(() => setNotifyMsg(""), 2000);
-    } catch {
-      setNotifyMsg("Couldn't save that.");
-    }
   }
 
   async function changeEmail() {
@@ -203,24 +190,6 @@ export default function Settings({ client, clientUid }) {
         )}
         {authMsg && <p className="set-ok">{authMsg}</p>}
         {authErr && <p className="set-err">{authErr}</p>}
-      </Section>
-
-      <Section title="Notifications" sub="Emails we send you. Sierra always hears from you either way.">
-        {[
-          ["postsReady", "When posts are ready for you to approve"],
-          ["messages", "When Sierra sends you a message"],
-          ["monthly", "A reminder to send your monthly brief"],
-        ].map(([key, label]) => (
-          <label key={key} className="set-toggle">
-            <input
-              type="checkbox"
-              checked={Boolean(notify[key])}
-              onChange={(e) => saveNotify({ ...notify, [key]: e.target.checked })}
-            />
-            <span>{label}</span>
-          </label>
-        ))}
-        {notifyMsg && <p className="set-ok">{notifyMsg}</p>}
       </Section>
 
       <Section
